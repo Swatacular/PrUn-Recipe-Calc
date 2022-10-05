@@ -107,7 +107,7 @@ foreach (var input in requirements)
 
 // write query results
 excelfile.Results.Clear();
-excelfile.Results.AddRange(queryResults.Values);
+excelfile.Results.AddRange(queryResults.Values.OrderByDescending(x => x.QuantityOfBuildingsRunningRecipe));
 
 Console.WriteLine("Formatting document");
 

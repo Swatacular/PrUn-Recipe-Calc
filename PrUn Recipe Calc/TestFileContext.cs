@@ -34,9 +34,10 @@ public class TestFileContext : ExcelContext
         };
         Action<ExcelWorksheet, ExcelRange> sheetPolisher = (sheet, range) =>
         {
-            range[1, 1, 1, range.Columns].Style.Border.Bottom.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
+            var columns = range.Columns;
+            range[1, 1, 1, columns].Style.Border.Bottom.Style = OfficeOpenXml.Style.ExcelBorderStyle.Thin;
             sheet.Cells.AutoFitColumns();
-            for (int col = 1; col <= sheet.Cells.Columns; col++)
+            for (int col = 1; col <= columns; col++)
             {
                 sheet.Column(col).Width *= 1.2;
             }
