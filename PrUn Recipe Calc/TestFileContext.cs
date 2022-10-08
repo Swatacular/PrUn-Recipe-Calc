@@ -17,6 +17,8 @@ public class TestFileContext : ExcelContext
     public List<RecipeDurations> RecipeDurations => GetSheet<RecipeDurations>();
     public List<RecipeInputs> RecipeInputs => GetSheet<RecipeInputs>();
     public List<RecipeOutputs> RecipeOutputs => GetSheet<RecipeOutputs>();
+
+    public List<BuildingExpertise> BuildingExpertise => GetSheet<BuildingExpertise>();
     public List<Query> Query => GetSheet<Query>("Query");
     public List<QueryResult> Results => GetSheet<QueryResult>();
     public List<Query> Remainder => GetSheet<Query>("Remainder");
@@ -53,43 +55,52 @@ public class TestFileContext : ExcelContext
         sheet1.WritePolisher(sheetPolisher);
 
         var sheet2 = builder.Sheet<RecipeInputs>();
-        sheet2.Column(x => x.Input);             // define a column for the Date property; look for a column with the name "Date"
-        sheet2.Column(x => x.RecipeName, "Key");  // for Quantity, look for a column with the name "Qty"
-        sheet2.Column(x => x.Amount)        // for Description, look for a column named either "Description" or "Desc"
+        sheet2.Column(x => x.Input);            
+        sheet2.Column(x => x.RecipeName, "Key");  // for RecipeName, look for a column with the name "Key"
+        sheet2.Column(x => x.Amount)   
             .ColumnFormatter(numberFormatter0);
         sheet2.WritePolisher(sheetPolisher);
 
         var sheet3 = builder.Sheet<RecipeOutputs>();
-        sheet3.Column(x => x.Amount)              // define a column for the Date property; look for a column with the name "Date"
+        sheet3.Column(x => x.Amount)           
             .ColumnFormatter(numberFormatter0);
-        sheet3.Column(x => x.RecipeName, "Key");  // for Quantity, look for a column with the name "Qty"
-        sheet3.Column(x => x.Output);       // for Description, look for a column named either "Description" or "Desc"
+        sheet3.Column(x => x.RecipeName, "Key");
+        sheet3.Column(x => x.Output); 
         sheet3.WritePolisher(sheetPolisher);
 
-        var sheet4 = builder.Sheet<Query>();
-        sheet4.Column(x => x.Quantity)
-            .ColumnFormatter(numberFormatter2);
-        sheet4.Column(x => x.Material);
-        sheet4.Column(x => x.TimeframeHours)
-            .ColumnFormatter(numberFormatter2);
+
+        var sheet4 = builder.Sheet<BuildingExpertise>();
+        sheet4.Column(x => x.Ticker);
+        sheet4.Column(x => x.Name);
+        sheet4.Column(x => x.Area);
+        sheet4.Column(x => x.Expertise);
         sheet4.WritePolisher(sheetPolisher);
 
-        var sheet5 = builder.Sheet<QueryResult>();
-        sheet5.Optional();
-        sheet5.Column(x => x.RecipeName);
-        sheet5.Column(x => x.Building);
-        sheet5.Column(x => x.Expertise);
-        sheet5.Column(x => x.QuantityOfBuildingsRunningRecipe, "Quantity")
+
+        var sheet5 = builder.Sheet<Query>();
+        sheet5.Column(x => x.Quantity)
+            .ColumnFormatter(numberFormatter2);
+        sheet5.Column(x => x.Material);
+        sheet5.Column(x => x.TimeframeHours)
             .ColumnFormatter(numberFormatter2);
         sheet5.WritePolisher(sheetPolisher);
 
-        var sheet6 = builder.Sheet<Query>("Remainder");
+        var sheet6 = builder.Sheet<QueryResult>();
         sheet6.Optional();
-        sheet6.Column(x => x.Quantity)
-            .ColumnFormatter(numberFormatter2);
-        sheet6.Column(x => x.Material);
-        sheet6.Column(x => x.TimeframeHours)
+        sheet6.Column(x => x.RecipeName);
+        sheet6.Column(x => x.Building);
+        sheet6.Column(x => x.Expertise);
+        sheet6.Column(x => x.QuantityOfBuildingsRunningRecipe, "Quantity")
             .ColumnFormatter(numberFormatter2);
         sheet6.WritePolisher(sheetPolisher);
+
+        var sheet7 = builder.Sheet<Query>("Remainder");
+        sheet7.Optional();
+        sheet7.Column(x => x.Quantity)
+            .ColumnFormatter(numberFormatter2);
+        sheet7.Column(x => x.Material);
+        sheet7.Column(x => x.TimeframeHours)
+            .ColumnFormatter(numberFormatter2);
+        sheet7.WritePolisher(sheetPolisher);
     }
 }
