@@ -13,7 +13,7 @@ var recipes = excelfile.RecipeDurations
         recipe.DurationHours,
         recipe.DurationTicks,
         recipe.Building,
-        excelfile.BuildingExpertise.Where(x => x.Ticker == recipe.Building).ToString(), //Need Help Here. Trying to add Expertise into the Recipe.
+        excelfile.BuildingExpertise.Where(x => x.Ticker == recipe.Building).FirstOrDefault().Expertise,
         excelfile.RecipeInputs.Where(x => x.RecipeName == recipe.RecipeName).ToList(),
         excelfile.RecipeOutputs.Where(x => x.RecipeName == recipe.RecipeName).ToList()
     ))
