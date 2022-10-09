@@ -19,6 +19,9 @@ public class TestFileContext : ExcelContext
     public List<RecipeOutputs> RecipeOutputs => GetSheet<RecipeOutputs>();
 
     public List<BuildingExpertise> BuildingExpertise => GetSheet<BuildingExpertise>();
+
+    public List<BuildingWorkforces> BuildingWorkforces => GetSheet<BuildingWorkforces>();
+    public List<WorkforceArea> WorkforceArea => GetSheet<WorkforceArea>();
     public List<Query> Query => GetSheet<Query>("Query");
     public List<QueryResult> Results => GetSheet<QueryResult>();
     public List<Query> Remainder => GetSheet<Query>("Remainder");
@@ -76,31 +79,49 @@ public class TestFileContext : ExcelContext
         sheet4.Column(x => x.Expertise);
         sheet4.WritePolisher(sheetPolisher);
 
-
-        var sheet5 = builder.Sheet<Query>();
-        sheet5.Column(x => x.Quantity)
-            .ColumnFormatter(numberFormatter2);
-        sheet5.Column(x => x.Material);
-        sheet5.Column(x => x.TimeframeHours)
-            .ColumnFormatter(numberFormatter2);
+        var sheet5 = builder.Sheet<BuildingWorkforces>();
+        sheet5.Column(x => x.Key);
+        sheet5.Column(x => x.Building);
+        sheet5.Column(x => x.Type);
+        sheet5.Column(x => x.Capacity);
+        sheet5.Column(x => x.Weight); //How much of the production lines productivity is attributed to that workforce
         sheet5.WritePolisher(sheetPolisher);
 
-        var sheet6 = builder.Sheet<QueryResult>();
-        sheet6.Optional();
-        sheet6.Column(x => x.RecipeName);
-        sheet6.Column(x => x.Building);
-        sheet6.Column(x => x.Expertise);
-        sheet6.Column(x => x.QuantityOfBuildingsRunningRecipe, "Quantity")
-            .ColumnFormatter(numberFormatter2);
+        var sheet6 = builder.Sheet<WorkforceArea>();
+        sheet6.Column(x => x.Type);
+        sheet6.Column(x => x.MinAreaPer1);
+        sheet6.Column(x => x.AvgAreaPer1);
+        sheet6.Column(x => x.MaxAreaPer1);
+        sheet6.Column(x => x.HBB); //How much area is needed per 1 worker if provided by HBB, Should be NULL if HBB provides for 0 workers
+        sheet6.Column(x => x.HBC); //^ HBC
+        sheet6.Column(x => x.HBM);
+        sheet6.Column(x => x.HBL);
         sheet6.WritePolisher(sheetPolisher);
 
-        var sheet7 = builder.Sheet<Query>("Remainder");
-        sheet7.Optional();
+        var sheet7 = builder.Sheet<Query>();
         sheet7.Column(x => x.Quantity)
             .ColumnFormatter(numberFormatter2);
         sheet7.Column(x => x.Material);
         sheet7.Column(x => x.TimeframeHours)
             .ColumnFormatter(numberFormatter2);
         sheet7.WritePolisher(sheetPolisher);
+
+        var sheet8 = builder.Sheet<QueryResult>();
+        sheet8.Optional();
+        sheet8.Column(x => x.RecipeName);
+        sheet8.Column(x => x.Building);
+        sheet8.Column(x => x.Expertise);
+        sheet8.Column(x => x.QuantityOfBuildingsRunningRecipe, "Quantity")
+            .ColumnFormatter(numberFormatter2);
+        sheet8.WritePolisher(sheetPolisher);
+
+        var sheet9 = builder.Sheet<Query>("Remainder");
+        sheet9.Optional();
+        sheet9.Column(x => x.Quantity)
+            .ColumnFormatter(numberFormatter2);
+        sheet9.Column(x => x.Material);
+        sheet9.Column(x => x.TimeframeHours)
+            .ColumnFormatter(numberFormatter2);
+        sheet9.WritePolisher(sheetPolisher);
     }
 }
