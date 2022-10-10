@@ -89,16 +89,17 @@ public class TestFileContext : ExcelContext
 
         var sheet6 = builder.Sheet<WorkforceArea>();
         sheet6.Column(x => x.Type);
-        sheet6.Column(x => x.MinAreaPer1);
-        sheet6.Column(x => x.AvgAreaPer1);
+        //sheet6.Column(x => x.MinAreaPer1);
+        //sheet6.Column(x => x.AvgAreaPer1);
         sheet6.Column(x => x.MaxAreaPer1);
-        sheet6.Column(x => x.HBB); //How much area is needed per 1 worker if provided by HBB, Should be NULL if HBB provides for 0 workers
-        sheet6.Column(x => x.HBC); //^ HBC
-        sheet6.Column(x => x.HBM);
-        sheet6.Column(x => x.HBL);
+        //sheet6.Column(x => x.HBB); //How much area is needed per 1 worker if provided by HBB, Should be NULL if HBB provides for 0 workers
+        //sheet6.Column(x => x.HBC); //^ HBC
+        //sheet6.Column(x => x.HBM);
+        //sheet6.Column(x => x.HBL);
         sheet6.WritePolisher(sheetPolisher);
 
         var sheet7 = builder.Sheet<Query>();
+        sheet7.SkipEmptyRows();
         sheet7.Column(x => x.Quantity)
             .ColumnFormatter(numberFormatter2);
         sheet7.Column(x => x.Material);
@@ -109,9 +110,31 @@ public class TestFileContext : ExcelContext
         var sheet8 = builder.Sheet<QueryResult>();
         sheet8.Optional();
         sheet8.Column(x => x.RecipeName);
-        sheet8.Column(x => x.Building);
+        sheet8.Column(x => x.BuildingTicker, "Building");
         sheet8.Column(x => x.Expertise);
         sheet8.Column(x => x.QuantityOfBuildingsRunningRecipe, "Quantity")
+            .ColumnFormatter(numberFormatter2);
+        sheet8.Column(x => x.BuildingArea)
+            .ColumnFormatter(numberFormatter2);
+        sheet8.Column(x => x.PioneerQuantity)
+            .ColumnFormatter(numberFormatter2);
+        sheet8.Column(x => x.PioneerArea)
+            .ColumnFormatter(numberFormatter2);
+        sheet8.Column(x => x.SettlerQuantity)
+            .ColumnFormatter(numberFormatter2);
+        sheet8.Column(x => x.SettlerArea)
+            .ColumnFormatter(numberFormatter2);
+        sheet8.Column(x => x.TechnicianQuantity)
+            .ColumnFormatter(numberFormatter2);
+        sheet8.Column(x => x.TechnicianArea)
+            .ColumnFormatter(numberFormatter2);
+        sheet8.Column(x => x.EngineerQuantity)
+            .ColumnFormatter(numberFormatter2);
+        sheet8.Column(x => x.EngineerArea)
+            .ColumnFormatter(numberFormatter2);
+        sheet8.Column(x => x.ScientistQuantity)
+            .ColumnFormatter(numberFormatter2);
+        sheet8.Column(x => x.ScientistArea)
             .ColumnFormatter(numberFormatter2);
         sheet8.WritePolisher(sheetPolisher);
 

@@ -7,13 +7,38 @@ var excelfile = new TestFileContext("C:\\Users\\Tom\\OneDrive\\Prosperous Univer
 
 Console.WriteLine("Hello, World!");
 
+var workforceAndAreas = (
+    from workforce in excelfile.BuildingWorkforces
+    join area in excelfile.WorkforceArea on workforce.Type equals area.Type
+    select new { Workforce = workforce, Area = area })
+    .ToLookup(x => x.Workforce.Building, StringComparer.OrdinalIgnoreCase);
+
+var buildings = (
+    from expertise in excelfile.BuildingExpertise
+    select new Building
+    (
+        expertise.Name,
+        expertise.Ticker,
+        expertise.Expertise,
+        expertise.Area,
+        workforceAndAreas[expertise.Ticker]
+            .Select(row => new Workforce
+            (
+                row.Workforce.Type,
+                row.Workforce.Capacity,
+                row.Workforce.Weight,
+                row.Area.MaxAreaPer1 * row.Workforce.Capacity
+            ))
+            .ToDictionary(x => x.Type, StringComparer.OrdinalIgnoreCase)
+    ))
+    .ToDictionary(building => building.Ticker, StringComparer.OrdinalIgnoreCase);
+
 var recipes = excelfile.RecipeDurations
     .Select(recipe => new Recipe(
         recipe.RecipeName,
         recipe.DurationHours,
         recipe.DurationTicks,
-        recipe.Building,
-        excelfile.BuildingExpertise.Where(x => x.Ticker == recipe.Building).FirstOrDefault().Expertise,
+        buildings[recipe.Building],
         excelfile.RecipeInputs.Where(x => x.RecipeName == recipe.RecipeName).ToList(),
         excelfile.RecipeOutputs.Where(x => x.RecipeName == recipe.RecipeName).ToList()
     ))
@@ -21,7 +46,8 @@ var recipes = excelfile.RecipeDurations
     .ToList();
 
 // balances by hour
-var requirements = excelfile.Query.GroupBy(x => x.Material).Select(x => new Requirement {
+var requirements = excelfile.Query.GroupBy(x => x.Material).Select(x => new Requirement
+{
     Material = x.Key,
     QuantityPerHour = x.Select(y => y.Quantity / y.TimeframeHours).Sum(),
 }).ToDictionary(x => x.Material);
@@ -55,7 +81,6 @@ while (true)
         {
             RecipeName = match.Recipe.RecipeName,
             Building = match.Recipe.Building,
-            Expertise = match.Recipe.Expertise,
             QuantityOfBuildingsRunningRecipe = quantity,
         });
     }
@@ -93,6 +118,28 @@ while (true)
     }
 }
 
+foreach (var result in queryResults.Values)
+{
+    result.BuildingTicker = result.Building.Ticker;
+    result.Expertise = result.Building.Expertise;
+    result.BuildingArea = result.Building.Area * result.QuantityOfBuildingsRunningRecipe;
+    var pioneers = result.Building.Workforce.GetValueOrDefault("PIONEER");
+    result.PioneerQuantity = (pioneers?.Capacity ?? 0) * result.QuantityOfBuildingsRunningRecipe;
+    result.PioneerArea = (pioneers?.Area ?? 0) * result.QuantityOfBuildingsRunningRecipe;
+    var settlers = result.Building.Workforce.GetValueOrDefault("SETTLER");
+    result.SettlerQuantity = (settlers?.Capacity ?? 0) * result.QuantityOfBuildingsRunningRecipe;
+    result.SettlerArea = (settlers?.Area ?? 0) * result.QuantityOfBuildingsRunningRecipe;
+    var technicians = result.Building.Workforce.GetValueOrDefault("TECHNICIAN");
+    result.TechnicianQuantity = (technicians?.Capacity ?? 0) * result.QuantityOfBuildingsRunningRecipe;
+    result.TechnicianArea = (technicians?.Area ?? 0) * result.QuantityOfBuildingsRunningRecipe;
+    var engineers = result.Building.Workforce.GetValueOrDefault("ENGINEER");
+    result.EngineerQuantity = (engineers?.Capacity ?? 0) * result.QuantityOfBuildingsRunningRecipe;
+    result.EngineerArea = (engineers?.Area ?? 0) * result.QuantityOfBuildingsRunningRecipe;
+    var scientists = result.Building.Workforce.GetValueOrDefault("SCIENTIST");
+    result.ScientistQuantity = (scientists?.Capacity ?? 0) * result.QuantityOfBuildingsRunningRecipe;
+    result.ScientistArea = (scientists?.Area ?? 0) * result.QuantityOfBuildingsRunningRecipe;
+}
+
 // write remainder
 excelfile.Remainder.Clear();
 foreach (var input in requirements)
@@ -120,10 +167,10 @@ Recipe? FindRecipe(string material)
     return recipes
         //Makes a list of recipes that produce the material
         .Where(x => x.Outputs.Any(y => y.Output == material))
-        //takes the list, and orders it by what recipe produces the most of that material
-        .OrderByDescending(x => x.Outputs.Where(y => y.Output == material).Select(y => y.Amount).Sum() / x.DurationHours)
+        //takes the list, and orders it by what recipe produces the most of that material per hour
+        .OrderBy(x => x.Outputs.Where(y => y.Output == material).Select(y => y.Amount).Sum() / x.DurationHours)
         //selects the top/first recipe (or returns null if there are no recipes found
         .FirstOrDefault();
 }
 
-internal record Recipe(string RecipeName, double DurationHours, int DurationTicks, string Building, string Expertise, List<RecipeInputs> Inputs, List<RecipeOutputs> Outputs);
+internal record Recipe(string RecipeName, double DurationHours, int DurationTicks, Building Building, List<RecipeInputs> Inputs, List<RecipeOutputs> Outputs);
